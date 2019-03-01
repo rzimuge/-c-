@@ -1,0 +1,243 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#define MAX_VERTEX_NUM 200
+
+typedef char VertexType;
+typedef struct ArcNode
+{
+	int adjvex;
+	ArcNode *nextarc;
+}ArcNode;//弧结点
+typedef struct VNode
+{
+	VertexType data;
+	ArcNode *firstarc;
+}VNode, AdjList[MAX_VERTEX_NUM];//表头结点
+typedef struct
+{
+	AdjList vertices;
+	int vexnum, arcnum;//弧,顶点数量
+}ALGraph;//图
+int  LocateVex(ALGraph *G, VertexType da)
+{
+	int  k;
+	for (k = 0; k < G->vexnum; k++)
+	{
+		if (G->vertices[k].data == da)
+			return k;
+	}
+	return -1;     /*  图中无此顶点  */
+}
+int  AddArc(ALGraph *G, VertexType fir, VertexType sec)
+{
+	ArcNode *t = (ArcNode*)malloc(sizeof(ArcNode) * 1);
+	t->adjvex = LocateVex(G, sec);//aaaaa
+	t->nextarc = NULL;
+
+	int k = LocateVex(G, fir);//aaaaaaa
+	if (G->vertices[k].firstarc == NULL)
+	{
+		G->vertices[k].firstarc = t;
+	}
+	else
+	{
+		ArcNode *w;
+		w = G->vertices[k].firstarc;
+		for (; w->nextarc != NULL; )
+		{
+			w = w->nextarc;
+		}
+		w->nextarc = t;
+	}
+	return 0;
+}
+int chushihua(ALGraph *A)
+{
+	int p = 0;
+	printf("输入顶点数量,弧数量,是否为有向图:");
+	scanf("%d%d%d", &A->vexnum, &A->arcnum, &p);
+	for (int i = 0; i < A->vexnum; i++)//输入顶点
+	{
+		printf("输入顶点%d:", i);
+		getchar();
+		scanf("%c", &A->vertices[i].data);
+		A->vertices[i].firstarc = NULL;
+	}
+
+	/*初始化弧*/
+	if (p == 1)//为有向图
+	{
+		for (int i = 0; i < A->arcnum; i++)
+		{
+			VertexType fir, sec;
+			printf("输入顶点两侧的数值:");
+			getchar();
+			scanf("%c%c", &fir, &sec);
+			AddArc(A, fir, sec);
+		}
+	}
+	else//为无向图
+	{
+		for (int i = 0; i < A->arcnum; i++)
+		{
+			VertexType fir, sec;
+			printf("输入顶点两侧的数值:");
+			getchar();
+			scanf("%c%c", &fir, &sec);
+			AddArc(A, fir, sec);
+			AddArc(A, sec, fir);
+		}
+	}
+	return 0;
+}
+
+
+
+typedef int ElemType;
+typedef struct Qnode
+{
+	ElemType    data;
+	struct Qnode  *next;
+}QNode;
+typedef struct link_queue
+{
+	QNode  *front, *rear;
+}Link_Queue;
+int initQueue(Link_Queue *Q)
+{
+	Q->front = (QNode *)malloc(sizeof(QNode) * 1);
+	if (!Q->front) return 0;
+	Q->rear = Q->front;
+	Q->front->next = NULL;
+	Q->front->data = 0;
+	return 1;
+}
+int DestroyQueue(Link_Queue *Q)
+{
+	while (Q->front) {   //全部清空，连头结点也不留
+		Q->rear = Q->front->next;
+		delete(Q->front);
+		Q->front = Q->rear;
+	}
+	return 1;
+}
+int EnQueue(Link_Queue *Q, ElemType e)
+{
+	QNode *p = (QNode *)malloc(sizeof(QNode) * 1);
+	if (!p) return 0;
+	p->data = e;
+	p->next = NULL;
+	Q->rear->next = p;
+	Q->rear = p;
+	Q->front->data++;
+	return 1;
+}
+int DeQueue(Link_Queue *Q, ElemType *e)
+{
+	if (Q->front == Q->rear) return 0;
+	QNode *w = Q->front->next;
+	*e = w->data;
+	Q->front->next = w->next;
+	if (Q->rear == w) Q->rear = Q->front;
+	delete(w);
+	Q->front->data--;
+	return 1;
+}
+int EmptyQueue(Link_Queue Q)
+{
+	if (Q.front->data == 0)
+		return 1;
+	else return 0;
+}
+
+
+int print(VertexType v)
+{
+	printf("%c\n", v);
+	return 1;
+}
+
+
+//深度
+bool visited[MAX_VERTEX_NUM];
+int(*visitFunc)(VertexType v);
+void DFS(ALGraph G, int address)
+{
+	visited[address] = 1;
+	visitFunc( G.vertices[address].data );
+	for (ArcNode *w = G.vertices[address].firstarc; w != NULL; w = w->nextarc)
+	{
+		if (!visited[w->adjvex])
+		{
+			DFS(G, w->adjvex);
+		}
+	}
+}
+void DFSTraverse(ALGraph G, int (*Visit)(VertexType v))
+{
+	visitFunc = Visit;
+	for (int i = 0; i < G.vexnum; i++)
+	{
+		visited[i] = 0;
+	}
+	for (int address = 0; address < G.vexnum; address++)
+	{
+		if (!visited[address])
+		{
+			DFS(G, address);
+		}
+	}
+}
+
+//广度
+void BFS(ALGraph G, int address)
+{
+	visited[address] = 1;
+	visitFunc(G.vertices[address].data);
+	Link_Queue Q;
+	initQueue(&Q);
+	EnQueue(&Q, address);
+	while (!EmptyQueue(Q))
+	{
+		int add;
+		DeQueue(&Q, &add);
+		ArcNode *w = G.vertices[add].firstarc;
+		for (; w != NULL; w = w->nextarc )
+		{
+			if (!visited[w->adjvex])
+			{
+				visited[w->adjvex] = 1;
+				visitFunc(G.vertices[w->adjvex].data);
+				EnQueue(&Q, w->adjvex);
+			}
+		}
+	}
+	DestroyQueue(&Q);
+}
+/*广度优先搜索非连通图*/
+void BFSTraverse(ALGraph G, int(*Visit)(VertexType v))
+{
+	visitFunc = Visit;
+	int v;
+	for (v = 0; v < G.vexnum; v++)
+	{
+		visited[v] = 0;							//将visited数组初始化
+	}
+	for (v = 0; v < G.vexnum; v++)
+	{
+		if (!visited[v])
+			BFS(G, v);	                        //对尚未访问的顶点调用BFS
+	}
+}
+
+
+int main()
+{
+	ALGraph G;
+	chushihua(&G);
+	DFSTraverse(G, print);
+	printf("***************************************************\n");
+	BFSTraverse(G, print);
+	return 0;
+}
