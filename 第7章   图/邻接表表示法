@@ -1,0 +1,127 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#define MAX_VERTEX_NUM 200
+typedef  enum { DG, DN, UDG, UDN }  GraphKind;
+typedef char VertexType;
+typedef struct ArcNode
+{
+	int adjvex;
+	ArcNode *nextarc;
+}ArcNode;//弧结点
+typedef struct VNode
+{
+	VertexType data;
+	ArcNode *firstarc;
+}VNode,AdjList[MAX_VERTEX_NUM];//表头结点
+
+typedef struct
+{
+	AdjList vertices;
+	int vexnum, arcnum;//弧,顶点数量
+	GraphKind kind;
+}ALGraph;//图
+
+
+int  LocateVex(ALGraph *G, VertexType da)
+{
+	int  k;
+	for (k = 0; k < G->arcnum; k++)
+	{
+		if (G->vertices[k].data == da)
+		return k;
+	}
+	return -1;     /*  图中无此顶点  */
+}
+
+int  AddArc(ALGraph *G, VertexType fir, VertexType sec)
+{
+	ArcNode *t = (ArcNode*)malloc(sizeof(ArcNode) * 1);
+	t->adjvex = LocateVex(G, sec);//aaaaa
+	t->nextarc = NULL;
+
+	int k = LocateVex(G, fir);//aaaaaaa
+	if (G->vertices[k].firstarc == NULL)
+	{
+		G->vertices[k].firstarc=t;
+	}
+	else
+	{
+		ArcNode *w;
+		w = G->vertices[k].firstarc;
+		for (; w->nextarc != NULL; )
+		{
+			w = w->nextarc;
+		}
+		w->nextarc = t;
+	}
+	return 0;
+}
+
+
+int chushihua(ALGraph *A)
+{
+	int p = 0;
+	printf("输入顶点数量,弧数量,是否为有向图:");
+	scanf("%d%d%d", &A->arcnum, &A->vexnum,&p);
+	for (int i = 0; i < A->arcnum; i++)//输入顶点
+	{
+		printf("输入顶点%d:",i );
+		getchar();
+		scanf("%c", &A->vertices[i].data); 
+		A->vertices[i].firstarc = NULL; 
+	}
+	
+	/*初始化弧*/
+	if (p == 1)//为有向图
+	{
+		for (int i = 0; i < A->vexnum; i++)
+		{
+			VertexType fir, sec;
+			printf("输入顶点两侧的数值:"); 
+			getchar();
+			scanf("%c%c", &fir, &sec);	
+			AddArc(A, fir, sec);
+		}
+	}
+	else//为无向图
+	{
+		for (int i = 0; i < A->vexnum; i++)
+		{
+			VertexType fir, sec;
+			printf("输入顶点两侧的数值:");
+			getchar();
+			scanf("%c%c", &fir, &sec); 
+			AddArc(A, fir, sec);
+			AddArc(A, sec, fir);
+		}
+	}
+	return 0;
+}
+
+int main()
+{
+	ALGraph A;
+	chushihua(&A);
+	for (int i = 0; i < A.arcnum; i++)
+	{
+		if (A.vertices[i].firstarc != NULL)
+		{
+			printf("(%d)|%c|->", i, A.vertices[i].data);
+		}
+		else
+		{
+			printf("(%d)|%c|^ \n", i, A.vertices[i].data);
+			continue;
+		}
+		ArcNode *w = A.vertices[i].firstarc;
+		for (;w->nextarc!=NULL; )
+		{
+			printf("|%c|->", A.vertices[w->adjvex]);
+			w = w->nextarc;
+		}
+		printf("|%c|^ ", A.vertices[w->adjvex]);
+		printf("\n");
+	}
+	return 0;
+}
