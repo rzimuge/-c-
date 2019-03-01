@@ -1,1 +1,74 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#define STACK_INIT_SIZE  10    /*  栈初始向量大小  */
+#define STACKINCREMENT 10   /*  存储空间分配增量  */
+typedef  char  ElemType;
+typedef struct sqstack
+{
+	ElemType  *bottom;     /*  栈不存在时值为NULL  */
+	ElemType  *top;           /*  栈顶指针  */
+	int   stacksize;             /*  当前已分配空间，以元素为单位  */
+}SqStack;
+int Init_Stack(SqStack *S)//栈的初始化
+{
+	S->bottom = (ElemType *)malloc(sizeof(ElemType)*STACK_INIT_SIZE);
+	if (!S->bottom) return 0;//分配失败，栈不存在
+	S->top = S->bottom;
+	S->stacksize = STACK_INIT_SIZE;
+	return 0;
+}
 
+ElemType GetTop(SqStack *S, ElemType *e)//获取栈顶元素
+{
+	if (S->top == S->bottom) return 0;//空栈
+	*e = *(S->top-1);
+	return *(S->top - 1);
+}
+int push(SqStack *S, ElemType  e)//压栈(元素进栈)
+{
+	if (S->top - S->bottom >= S->stacksize)// 如栈满，追加存储空间  
+	{ 
+		realloc(S->bottom, sizeof(ElemType)*(S->stacksize + STACKINCREMENT));
+		if (!S->bottom) return  0;//分配失败，栈不存在
+		S->top = S->bottom + S->stacksize;
+		S->stacksize += STACKINCREMENT;
+	}
+	*(S->top) = e;
+	S->top++;
+	return 1;
+}
+ElemType pop(SqStack   *S, ElemType *e)//弹栈(元素出栈)
+{
+	if (S->top == S->bottom) return 0;//空栈
+	S->top--;   
+	*e =*(S->top);
+	return *(S->top);
+}
+
+
+int main()
+{
+	SqStack S;
+	Init_Stack(&S);
+	for(int i=0;i<12;i++)
+	{
+		ElemType t;
+		scanf("%c", &t);
+		push(&S, t);
+	}
+	ElemType m;
+	GetTop(&S, &m);
+
+	printf("%c \n", m);
+
+
+	for (int i = 0; i<12; i++)
+	{
+		ElemType t;
+		pop(&S, &t);
+		printf("%c", t);
+	}
+	printf(" \n");
+	return 0;
+}
