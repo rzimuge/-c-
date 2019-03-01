@@ -1,0 +1,51 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#define  MAX_QUEUE_SIZE   10
+typedef int ElemType;
+typedef  struct  queue
+{
+	ElemType   Queue_array[MAX_QUEUE_SIZE];
+	int   front;
+	int   rear;
+}SqQueue;
+int init_CieQueue(SqQueue *Cq)
+{
+	Cq->front = 0;
+	Cq->rear = 0;
+	return 1;
+}
+int Insert_CirQueue(SqQueue  *Q, ElemType  e)//将数据元素e插入到循环队列Q的队尾
+{
+	if ((Q->rear + 1) % MAX_QUEUE_SIZE == Q->front)  return  0;  //队满，返回错误标志
+	Q->Queue_array[Q->rear] = e;   //元素e入队
+	Q->rear = (Q->rear + 1) % MAX_QUEUE_SIZE;//队尾指针向前移动
+	return 1;        //入队成功
+}
+int Delete_CirQueue(SqQueue  *Q, ElemType  *e)//将循环队列Q的队首元素出队
+{
+	if (Q->front == Q->rear) return 0; //队空，返回错误标志 
+	*e = Q->Queue_array[Q->front];  //取队首元素
+	Q->front = (Q->front + 1) % MAX_QUEUE_SIZE;// 队首指针向前移动
+	return 1;
+}
+
+
+
+int main()
+{
+	SqQueue Cq;
+	init_CieQueue(&Cq);
+	for (int i = 0; i < MAX_QUEUE_SIZE-1; i++)
+	{
+		int t = 0;
+		Insert_CirQueue(&Cq, i+1000);
+	}
+	for (int i = 0; i < MAX_QUEUE_SIZE; i++)
+	{
+		int e = 0;
+		Delete_CirQueue(&Cq, &e);
+		printf("Queue_array[%d] = %d\n",i, e);
+	}
+	return 0;
+}
