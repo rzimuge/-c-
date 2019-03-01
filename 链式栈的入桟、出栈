@@ -1,0 +1,99 @@
+#include<stdio.h>
+#include<stdlib.h>
+#define stack_init  100
+#define stack_jia 10
+typedef struct stack;
+typedef struct StackTop;
+typedef int StackType;/*The Stack Type*/
+typedef struct stack
+{
+	StackType sdata;
+	stack *back;
+}*Stack;
+typedef struct StackTop {
+	Stack top;
+}StackTop;
+void InitStack(StackTop *S)
+{
+	S->top = NULL;
+}
+int push(StackTop *s, StackType T)
+{
+	Stack p;
+	p = (Stack)malloc(sizeof(stack));
+	p->sdata = T;
+	p->back = s->top;
+	s->top = p;
+	return 1;
+}
+int pop(StackTop *s, StackType *e)
+{
+	Stack p;
+	p = (Stack)malloc(sizeof(stack));
+	if (s->top == NULL) return 0;
+	*e = s->top->sdata;
+	p = s->top;
+	s->top = p->back;
+	free(p);
+	return 1;
+}
+int DestoryStack(StackTop *s)
+{
+	if (s->top == NULL)
+	{
+		return 0;
+	}
+	else
+	{
+		Stack p, b;
+		p = s->top;
+		b = p->back;
+		while (b != 0)
+		{
+			free(p);
+			p = b;
+			b = p->back;
+		}
+		free(p);
+	}
+}
+int StackEmpty(StackTop *S)
+{
+	if (S->top == NULL)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+int stacksize(StackTop *s)
+{
+	Stack p;
+	p = s->top;
+	int i = 0;
+	for (; p != NULL; i++)
+	{
+		p = p->back;
+	}
+	return i;
+}
+
+int main()
+{
+	StackTop s;
+	InitStack(&s);
+	for (int i = 1; i <= 6; i++)
+	{
+		push(&s, i);
+	}
+	int e = 0;
+	printf("%d \n", stacksize(&s));
+	for (int i = 0; i < 6; i++)
+	{
+		pop(&s, &e);
+		printf("%d ", e);
+	}
+	return 0;
+}
