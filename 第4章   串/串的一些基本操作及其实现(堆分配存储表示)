@@ -1,1 +1,112 @@
+#define _CRT_SECURE_NO_WARNINGS
 
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+using namespace std;
+typedef struct//堆分配存储表示
+{
+	char *ch;
+	int length;
+}Hstring;
+int initstring(Hstring *S, int len)//自需
+{
+	S->ch = (char *)malloc(sizeof(char)*len);
+	S->length = len;
+	for (int i = 0; i<len; i++)
+	{
+		scanf("%c", &S->ch[i]);
+
+	}
+	return 1;
+}
+int initstring(Hstring *S, int len, int y)//自需
+{
+	S->ch = (char *)malloc(sizeof(char)*len);
+	S->length = len;
+	return 1;
+}
+int StrInsert(Hstring *S, int pos, Hstring T)//从1计数
+{
+	if (pos<1 || pos>S->length + 1) { return 0; }
+	if (!(S->ch = (char *)realloc(S->ch, (S->length + T.length) * sizeof(char)))) return 0;
+	for (int i = pos - 1; i<S->length; i++)
+	{
+		S->ch[i + T.length] = S->ch[i];
+	}
+	for (int i = 0; i<T.length; i++)
+	{
+		S->ch[pos - 1 + i] = T.ch[i];
+	}
+	S->length += T.length;
+	return 1;
+}
+int StrAssing(Hstring *T, char *chars)
+{
+
+	if (T->ch) free(T->ch);
+	int l = 0;
+	l = strlen(chars);
+	initstring( T, l, 0);
+	for (int i = 0; i<l; i++)
+	{
+		T->ch[i] = chars[i];
+	}
+	return 1;
+}
+int Strlength( Hstring S)
+{
+	return S.length;
+} 
+int StrCompare(Hstring S, Hstring T)
+{
+	// 若 S>T, 则返回值 >0  若 S = T 则返回值 = 0 ,若 S<T 则返回值<0
+	for (int i = 0; i < S.length && i < T.length; ++i)
+	{
+		if(S.ch[i] != T.ch[i])   return S.ch[i] - T.ch[i];
+	}
+	return S.length - T.length;
+} // StrCompare 
+int SubString(Hstring S, Hstring *Sub,int pos,int len)//从1计数
+{
+	initstring(Sub, len, 0);
+	if(pos < 1 || pos > S.length || len < 0 || len >  S.length - pos + 1) return 0;
+	for (int i = 0; i < len; i++)
+	{
+		Sub->ch[i] = S.ch[pos-1 + i];
+	}
+	Sub->length = len;
+	return 1;
+}
+
+void print(Hstring S)//自需
+{
+	for (int i = 0; i<S.length; i++)
+	{
+		printf("%c", S.ch[i]);
+	}
+	printf("\n");
+}
+
+
+int main()
+{
+	Hstring S1, S2, S3,s4;
+	initstring(&S1, 15);
+	print(S1);
+	getchar();
+	initstring(&S2, 18);
+	print(S2);
+	StrInsert(&S1, 14, S2);
+	print(S1);
+	printf("*************************\n");
+	SubString(S1, &s4, 14, 5);
+	print(s4);
+	printf("*************************\n");
+	char *s;
+	s = (char *)"dsafsdaf";
+	S3.ch = NULL;
+	StrAssing(&S3, s);
+	print(S3);
+	return 0;
+} //串的结构
