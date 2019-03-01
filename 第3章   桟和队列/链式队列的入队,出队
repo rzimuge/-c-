@@ -1,1 +1,77 @@
-
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+typedef int ElemType;
+typedef struct Qnode
+{
+	ElemType    data;
+	struct Qnode  *next;
+}QNode;
+typedef struct link_queue
+{
+	QNode  *front, *rear;
+}Link_Queue;
+int initQueue(Link_Queue *Q)
+{
+	Q->front = (QNode *)malloc( sizeof(QNode)*1 );
+	if (!Q->front) return 0;
+	Q->rear = Q->front;
+	Q->front->next = NULL;
+	Q->front->data = 0;
+	return 1;
+}
+int DestroyQueue(Link_Queue *Q)
+{
+	while (Q->front) {   //全部清空，连头结点也不留
+		Q->rear = Q->front->next;
+		delete(Q->front);
+		Q->front = Q->rear;
+	}
+	return 1;
+}
+int EnQueue(Link_Queue *Q, ElemType e)
+{
+	QNode *p = (QNode *)malloc(sizeof(QNode) * 1);
+	if (!p) return 0;
+	p->data = e;
+	p->next = NULL;
+	Q->rear->next = p;
+	Q->rear=p;
+	Q->front->data++;
+	return 1;
+}
+int DeQueue(Link_Queue *Q, ElemType *e)
+{
+	if (Q->front == Q->rear) return 0;
+	QNode *w = Q->front->next;
+	*e = w->data;
+	Q->front->next = w->next;
+	if (Q->rear == w) Q->rear = Q->front;
+	delete(w);
+	Q->front->data--;
+	return 1;
+}
+int EmptyQueue(Link_Queue Q)
+{
+	if(Q.front->data==0)
+	return 1;
+	else return 0;
+}
+int main()
+{
+	Link_Queue Q;
+	initQueue(&Q);
+	for (int i = 0; i < 10; i++)
+	{
+		int w = 0;
+		scanf("%d", &w);
+		EnQueue(&Q, w);
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		int w = 0;
+		DeQueue(&Q, &w);
+		printf("%d\n", w);
+	}
+	return 0;
+}
